@@ -1,0 +1,703 @@
+openapi: 3.0.3
+info:
+  title: Coding Exam Platform API (Week-1 scope)
+  version: 0.1.0
+  description: |
+    Derived from LLD section 3.19 and the DTOs in section 1.
+    Marked "ADDED" are endpoints missing from the LLD that the week-1 demo needs.
+    All timestamps are ISO-8601 UTC. Server time is authoritative.
+servers:
+  - url: http://localhost:8080
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Auth
+  - name: Problems
+  - name: Contests
+  - name: Sessions
+  - name: Events
+  - name: Submissions
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Log in (student or instructor)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: { type: string }
+                password: { type: string }
+                deviceFp: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken: { type: string }
+                  refreshToken: { type: string, description: Optional in week 1 }
+                  user: { $ref: '#/components/schemas/UserDTO' }
+        '401': { $ref: '#/components/responses/Error' }
+        '423': { $ref: '#/components/responses/Error' }
+
+  /problems:
+    post:
+      tags: [Problems]
+      summary: Create a problem (instructor)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, statementMd, timeLimitMs, memoryLimitKb, checkerType]
+              properties:
+                title: { type: string }
+                statementMd: { type: string }
+                timeLimitMs: { type: integer }
+                memoryLimitKb: { type: integer }
+                checkerType: { $ref: '#/components/schemas/CheckerType' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IdResponse' }
+
+  /problems/{id}/testcases:
+    post:
+      tags: [Problems]
+      summary: Add a testcase (instructor)
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [input, expected, points]
+              properties:
+                input: { type: string }
+                expected: { type: string }
+                points: { type: integer }
+                isSample: { type: boolean, default: false }
+                group: { type: integer }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IdResponse' }
+
+  /contests:
+    post:
+      tags: [Contests]
+      summary: Create a contest (instructor)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, startsAt, endsAt, durationSec, languages]
+              properties:
+                title: { type: string }
+                startsAt: { type: string, format: date-time }
+                endsAt: { type: string, format: date-time }
+                durationSec: { type: integer }
+                languages:
+                  type: array
+                  items: { $ref: '#/components/schemas/Language' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string }
+                  status: { $ref: '#/components/schemas/ContestStatus' }
+
+  /contests/{id}:
+    get:
+      tags: [Contests]
+      summary: Contest with problems (samples only, never hidden tests)
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ContestView' }
+
+  /contests/{id}/problems:
+    post:
+      tags: [Contests]
+      summary: Attach a problem to a contest
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [problemId, label, points]
+              properties:
+                problemId: { type: string }
+                label: { type: string, example: A }
+                points: { type: integer }
+      responses:
+        '204': { description: Attached }
+
+  /contests/{id}/enroll:
+    post:
+      tags: [Contests]
+      summary: Enroll students
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userIds]
+              properties:
+                userIds:
+                  type: array
+                  items: { type: string }
+      responses:
+        '204': { description: Enrolled }
+
+  /contests/{id}/publish:
+    post:
+      tags: [Contests]
+      summary: Publish the contest and sign its Policy
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { $ref: '#/components/schemas/ContestStatus' }
+                  policyVersion: { type: integer }
+
+  /contests/{id}/start:
+    post:
+      tags: [Contests]
+      summary: "ADDED - Start the contest (SCHEDULED -> RUNNING); moves LOCKED sessions to ACTIVE"
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { $ref: '#/components/schemas/ContestStatus' }
+
+  /contests/{id}/end:
+    post:
+      tags: [Contests]
+      summary: End the contest; queues an END command for every active session's next heartbeat
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { $ref: '#/components/schemas/ContestStatus' }
+                  sessionsNotified: { type: integer }
+
+  /sessions/start:
+    post:
+      tags: [Sessions]
+      summary: Start a session (called by the Watchdog after preflight)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [contestId, deviceFp, clientVersion, preflight]
+              properties:
+                contestId: { type: string }
+                deviceFp: { type: string }
+                clientVersion: { type: string }
+                preflight: { $ref: '#/components/schemas/PreflightReport' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessionId: { type: string }
+                  sessionKey: { type: string, description: Base64 256-bit key. Returned once; used to HMAC events. }
+                  policy: { $ref: '#/components/schemas/Policy' }
+                  serverTime: { type: string, format: date-time }
+        '403': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+
+  /sessions/{id}/lockdown-confirmed:
+    post:
+      tags: [Sessions]
+      summary: Client reports lockdown is on (CREATED/PREFLIGHT -> LOCKED, then ACTIVE at contest start)
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [proof]
+              properties:
+                proof:
+                  type: object
+                  description: Which lockdown layers are active
+                  properties:
+                    processMonitor: { type: boolean }
+                    firewall: { type: boolean }
+                    usbBlock: { type: boolean }
+                    shellLock: { type: boolean }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { $ref: '#/components/schemas/SessionStatus' }
+
+  /sessions/{id}/heartbeat:
+    post:
+      tags: [Sessions]
+      summary: Heartbeat; the response carries commands from the server
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [seq, status]
+              properties:
+                seq: { type: integer }
+                status:
+                  type: object
+                  description: ClientStatus
+                  properties:
+                    lockdownActive: { type: boolean }
+                    policyVersion: { type: integer }
+                    lastEventSeq: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  serverTime: { type: string, format: date-time }
+                  policyVersion: { type: integer }
+                  commands:
+                    type: array
+                    items: { $ref: '#/components/schemas/Command' }
+
+  /sessions/{id}/policy:
+    get:
+      tags: [Sessions]
+      summary: Current signed Policy
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Policy' }
+
+  /sessions/{id}/end:
+    post:
+      tags: [Sessions]
+      summary: End the session (student finished, or after END command)
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { $ref: '#/components/schemas/SessionStatus' }
+
+  /sessions/{id}/force-end:
+    post:
+      tags: [Sessions]
+      summary: "Instructor force-ends a student's session (not in the week-1 split; optional demo item)"
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { $ref: '#/components/schemas/SessionStatus' }
+
+  /sessions/{id}/events:
+    post:
+      tags: [Events]
+      summary: Upload a batch of HMAC-signed, hash-chained events (max 500)
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              maxItems: 500
+              items: { $ref: '#/components/schemas/EventRecord' }
+      responses:
+        '200':
+          description: Idempotent on (sessionId, seq). A chain or HMAC failure still keeps the events and records CHAIN_BREAK.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accepted: { type: integer }
+                  lastSeq: { type: integer }
+    get:
+      tags: [Events]
+      summary: List stored events (instructor)
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/EventRecord' }
+
+  /sessions/{id}/timeline:
+    get:
+      tags: [Events]
+      summary: Events plus chain verification and integrity score (instructor)
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  events:
+                    type: array
+                    items: { $ref: '#/components/schemas/EventRecord' }
+                  chainOk: { type: boolean }
+                  brokenAtSeq: { type: integer, nullable: true }
+                  integrityScore: { type: integer }
+                  breakdown:
+                    type: object
+                    description: EventType -> { count, weight }
+                    additionalProperties:
+                      type: object
+                      properties:
+                        count: { type: integer }
+                        weight: { type: integer }
+
+  /sessions/{id}/run:
+    post:
+      tags: [Submissions]
+      summary: Run sample tests or custom input; no score. Limit 1 per 5 s.
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [problemId, language, source]
+              properties:
+                problemId: { type: string }
+                language: { $ref: '#/components/schemas/Language' }
+                source: { type: string, maxLength: 65536 }
+                customInput: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  verdict: { $ref: '#/components/schemas/Verdict' }
+                  compileLog: { type: string }
+                  perTest:
+                    type: array
+                    items: { $ref: '#/components/schemas/PerTest' }
+        '429': { $ref: '#/components/responses/Error' }
+
+  /sessions/{id}/submissions:
+    post:
+      tags: [Submissions]
+      summary: Submit for judging. Limit 1 per 10 s per problem.
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [problemId, language, source]
+              properties:
+                problemId: { type: string }
+                language: { $ref: '#/components/schemas/Language' }
+                source: { type: string, maxLength: 65536 }
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  submissionId: { type: string }
+                  status: { $ref: '#/components/schemas/SubmissionStatus' }
+        '403': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
+
+  /submissions/{id}:
+    get:
+      tags: [Submissions]
+      summary: Submission result. Never exposes expected output.
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { $ref: '#/components/schemas/SubmissionStatus' }
+                  verdict: { $ref: '#/components/schemas/Verdict' }
+                  score: { type: integer }
+                  maxScore: { type: integer }
+                  perTest:
+                    type: array
+                    items: { $ref: '#/components/schemas/PerTest' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/AppError' }
+
+  schemas:
+    AppError:
+      type: object
+      properties:
+        code:
+          type: string
+          example: SESSION_ACTIVE_ELSEWHERE
+          description: "BAD_CREDENTIALS, ACCOUNT_LOCKED, NOT_ENROLLED, CONTEST_NOT_RUNNING, SESSION_ACTIVE_ELSEWHERE, SESSION_NOT_ACTIVE, RATE_LIMITED, ..."
+        message: { type: string }
+        details: { type: object }
+
+    IdResponse:
+      type: object
+      properties:
+        id: { type: string }
+
+    UserDTO:
+      type: object
+      properties:
+        id: { type: string }
+        username: { type: string }
+        role: { $ref: '#/components/schemas/Role' }
+        fullName: { type: string }
+
+    Role: { type: string, enum: [STUDENT, INSTRUCTOR, ADMIN] }
+    ContestStatus: { type: string, enum: [DRAFT, SCHEDULED, RUNNING, ENDED, ARCHIVED] }
+    SessionStatus: { type: string, enum: [CREATED, PREFLIGHT, LOCKED, ACTIVE, ENDED, TERMINATED, EXPIRED] }
+    SubmissionStatus: { type: string, enum: [PENDING, JUDGING, DONE, ERROR] }
+    Verdict: { type: string, enum: [AC, WA, TLE, MLE, RE, CE, IE, PARTIAL] }
+    Language: { type: string, enum: [C, CPP, JAVA, PYTHON] }
+    CheckerType: { type: string, enum: [EXACT, TOKEN, FLOAT_EPS, CUSTOM] }
+    Severity: { type: string, enum: [INFO, LOW, MEDIUM, HIGH, CRITICAL] }
+    PolicyAction: { type: string, enum: [BLOCK, WARN, LOG] }
+    EventType:
+      type: string
+      enum: [PROCESS_BLOCKED, USB_INSERTED, NEW_NIC, SERVICE_RESTARTED, HEARTBEAT_GAP,
+             CLOCK_CHANGE, VM_DETECTED, MULTI_MONITOR, REMOTE_TOOL, SAFE_MODE,
+             FIREWALL_CHANGED, KEY_BLOCKED, FOCUS_LOST, LARGE_PASTE, TYPING_BURST,
+             POLICY_TAMPER, CHAIN_BREAK, LOGIN_FAIL, CLIENT_CRASH_RECOVERED]
+
+    Command:
+      type: object
+      required: [type]
+      properties:
+        type: { type: string, enum: [END, WARN, UPDATE_POLICY, UNLOCK] }
+        message: { type: string, description: For WARN }
+        version: { type: integer, description: For UPDATE_POLICY }
+        token: { type: string, description: For UNLOCK (signed) }
+
+    PerTest:
+      type: object
+      properties:
+        testcaseId: { type: string }
+        verdict: { $ref: '#/components/schemas/Verdict' }
+        timeMs: { type: integer }
+        memKb: { type: integer }
+        stdoutSnippet: { type: string, description: Samples only }
+
+    ContestView:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        status: { $ref: '#/components/schemas/ContestStatus' }
+        startsAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time }
+        durationSec: { type: integer }
+        languages:
+          type: array
+          items: { $ref: '#/components/schemas/Language' }
+        problems:
+          type: array
+          items:
+            type: object
+            properties:
+              problemId: { type: string }
+              label: { type: string }
+              points: { type: integer }
+              title: { type: string }
+              statementMd: { type: string }
+              samples:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    input: { type: string }
+                    expected: { type: string }
+
+    PreflightReport:
+      type: object
+      properties:
+        vm: { type: boolean }
+        vmEvidence: { type: array, items: { type: string } }
+        monitorCount: { type: integer }
+        remoteTools: { type: array, items: { type: string } }
+        usbStorage: { type: array, items: { type: string } }
+        forbiddenRunning: { type: array, items: { type: string } }
+        safeMode: { type: boolean }
+        osBuild: { type: string }
+        clientVersion: { type: string }
+
+    Policy:
+      type: object
+      properties:
+        policyId: { type: string }
+        contestId: { type: string }
+        version: { type: integer }
+        allowedProcesses:
+          type: array
+          items:
+            type: object
+            properties:
+              name: { type: string }
+              sha256: { type: string }
+              signer: { type: string }
+        allowedServer:
+          type: object
+          properties:
+            host: { type: string }
+            ip: { type: string }
+            ports: { type: array, items: { type: integer } }
+        blockUsb: { type: boolean }
+        blockedKeys: { type: array, items: { type: string } }
+        durationSec: { type: integer }
+        heartbeatSec: { type: integer }
+        actionByEvent:
+          type: object
+          additionalProperties: { $ref: '#/components/schemas/PolicyAction' }
+        preflight:
+          type: object
+          properties:
+            blockVm: { type: boolean }
+            maxMonitors: { type: integer }
+            forbiddenProcesses: { type: array, items: { type: string } }
+        issuedAt: { type: string, format: date-time }
+        signature: { type: string, description: "Base64 Ed25519 over canonical JSON of all other fields (see docs/canonical-json.md)" }
+
+    EventRecord:
+      type: object
+      required: [eventId, sessionId, seq, type, severity, ts, payload, prevHash, hash, hmac]
+      properties:
+        eventId: { type: string }
+        sessionId: { type: string }
+        seq: { type: integer, description: Contiguous, starts at 1 }
+        type: { $ref: '#/components/schemas/EventType' }
+        severity: { $ref: '#/components/schemas/Severity' }
+        ts: { type: string, format: date-time }
+        payload: { type: object }
+        prevHash: { type: string, description: Hex }
+        hash: { type: string, description: "Hex SHA256(prevHash + canonical(event))" }
+        hmac: { type: string, description: "Hex HMAC(sessionKey, hash)" }
