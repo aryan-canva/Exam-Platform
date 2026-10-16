@@ -37,7 +37,7 @@ public class User {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    public enum Role { STUDENT, INSTRUCTOR, ADMIN }
+    public enum Role { STUDENT, TEACHER, ADMIN }
 
     // ── Getters & Setters ─────────────────────────────────────────────────────
     public UUID getId() { return id; }

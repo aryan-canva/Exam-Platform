@@ -1,23 +1,35 @@
-### 1. Register a new user
-POST http://localhost:8080/api/auth/register
+### Register teacher (run this ONCE first)
+POST http://localhost:8080/auth/register
 Content-Type: application/json
 
 {
-  "username": "mentor_demo",
-  "email": "mentor@test.com",
-  "password": "Test@12345",
-  "role": "TEACHER"
-}
-
-### 2. Login → get JWT token
-POST http://localhost:8080/api/auth/login
-Content-Type: application/json
-
-{
-  "email": "mentor@test.com",
+  "username": "teacher2",
   "password": "Test@12345"
 }
 
-### 3. Access protected endpoint (paste your accessToken below)
-GET http://localhost:8080/api/problems
-Authorization: Bearer PASTE_ACCESS_TOKEN_HERE
+###
+### Login as teacher
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "teacher2",
+  "password": "Test@12345"
+}
+### Get all problems
+GET http://localhost:8080/problems
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJkNGRmMWI1Zi1mM2U3LTQzM2ItYmFkMy1jMmUxOGU4MjEwZTMiLCJyb2xlIjoiVEVBQ0hFUiIsInR5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3OTIxNTg3MzEsImV4cCI6MTc5MjE1OTYzMX0.2zDa6514Z-SgQISzGFuIRaeM7HQ6s9yN2L2HNhap4pJEjMtFrKmXTynBC_drB3VQ
+
+###
+
+### Create a contest
+POST http://localhost:8080/contests
+Content-Type: application/json
+Authorization: Bearer PASTE_TOKEN_HERE
+
+{
+  "title": "Demo Exam",
+  "durationSec": 3600,
+  "scoringMode": "ICPC"
+}
+

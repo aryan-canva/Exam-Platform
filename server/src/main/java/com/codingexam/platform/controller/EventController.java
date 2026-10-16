@@ -36,7 +36,7 @@ public class EventController {
     public ResponseEntity<List<Event>> getEvents(
             @RequestParam UUID sessionId,
             @AuthenticationPrincipal AuthContext ctx) {
-        boolean isInstructor = ctx.hasRole(User.Role.INSTRUCTOR, User.Role.ADMIN);
+        boolean isInstructor = ctx.hasRole(User.Role.TEACHER, User.Role.ADMIN);
         List<Event> events = eventService.getEvents(sessionId, ctx.userId(), isInstructor);
         return ResponseEntity.ok(events);
     }
@@ -45,7 +45,7 @@ public class EventController {
     public ResponseEntity<Map<String, Integer>> getSuspicious(
             @RequestParam UUID sessionId,
             @AuthenticationPrincipal AuthContext ctx) {
-        ctx.requireRole(User.Role.INSTRUCTOR, User.Role.ADMIN);
+        ctx.requireRole(User.Role.TEACHER, User.Role.ADMIN);
         int count = eventService.getSuspiciousEventCount(sessionId);
         return ResponseEntity.ok(Map.of("suspiciousEvents", count));
     }

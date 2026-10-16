@@ -30,17 +30,24 @@ public class ProblemController {
     @PostMapping
     public ResponseEntity<Problem> createProblem(@Valid @RequestBody CreateProblemRequest req,
                                                    @AuthenticationPrincipal AuthContext ctx) {
-        ctx.requireRole(User.Role.INSTRUCTOR, User.Role.ADMIN);
+        ctx.requireRole(User.Role.TEACHER, User.Role.ADMIN);
         Problem p = problemService.createProblem(req, ctx.userId());
         return ResponseEntity.status(HttpStatus.CREATED).body(p);
     }
-
+    
+/** GET /problems — list all problems */
+@GetMapping
+public ResponseEntity<java.util.List<Problem>> listProblems(
+        @AuthenticationPrincipal AuthContext ctx) {
+    ctx.requireRole(User.Role.TEACHER, User.Role.ADMIN);
+    return ResponseEntity.ok(problemService.listAllProblems());
+}
     /** POST /problems/{id}/testcases — add a testcase */
     @PostMapping("/{id}/testcases")
     public ResponseEntity<Testcase> addTestcase(@PathVariable UUID id,
                                                  @RequestBody Map<String, Object> body,
                                                  @AuthenticationPrincipal AuthContext ctx) {
-        ctx.requireRole(User.Role.INSTRUCTOR, User.Role.ADMIN);
+        ctx.requireRole(User.Role.TEACHER, User.Role.ADMIN);
         String inputRef    = (String) body.get("inputRef");
         String expectedRef = (String) body.get("expectedRef");
         int points         = (int) body.getOrDefault("points", 0);

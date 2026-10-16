@@ -24,7 +24,7 @@ paths:
     post:
       tags: [Auth]
       security: []
-      summary: Log in (student or instructor)
+      summary: Log in (student or teacher)
       requestBody:
         required: true
         content:
