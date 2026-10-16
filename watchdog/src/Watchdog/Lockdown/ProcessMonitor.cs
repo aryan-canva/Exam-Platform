@@ -35,6 +35,13 @@ public sealed record ProcessMonitorOptions
     public int Workers { get; init; } = 4;
 
     /// <summary>
+    /// File names to block even when they sit in a trusted Windows folder (for example "notepad",
+    /// "ping"). An allowlist entry that matches by hash still wins. Typically fed from
+    /// Policy.preflight.forbiddenProcesses.
+    /// </summary>
+    public IReadOnlyCollection<string> ExtraDeniedProcesses { get; init; } = Array.Empty<string>();
+
+    /// <summary>
     /// Only enforce on processes for which this returns true. Null means everything.
     /// Use it in tests and on dev machines (for example: only children of the test runner).
     /// </summary>
@@ -176,7 +183,8 @@ public sealed class ProcessMonitor : IDisposable
     public void UpdateAllowlist(IReadOnlyList<AllowedProcess> allowlist)
     {
         ArgumentNullException.ThrowIfNull(allowlist);
-        var matcher = new AllowlistMatcher(allowlist, _hasher, _signer, _os, _opts.AllowNameOnlyEntries);
+        var matcher = new AllowlistMatcher(
+            allowlist, _hasher, _signer, _os, _opts.AllowNameOnlyEntries, _opts.ExtraDeniedProcesses);
 
         // An allowlist that matches nothing blocks the kiosk and the Watchdog's own children.
         // Refuse it rather than turn the exam desktop into a blank screen.

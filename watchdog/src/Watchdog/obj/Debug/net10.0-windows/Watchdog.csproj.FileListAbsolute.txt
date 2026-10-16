@@ -1,0 +1,6 @@
+C:\Users\Akhil\exam-platform\watchdog\src\Watchdog\obj\Debug\net10.0-windows\Watchdog.csproj.AssemblyReference.cache
+C:\Users\Akhil\exam-platform\watchdog\src\Watchdog\obj\Debug\net10.0-windows\Watchdog.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Akhil\exam-platform\watchdog\src\Watchdog\obj\Debug\net10.0-windows\Watchdog.AssemblyInfoInputs.cache
+C:\Users\Akhil\exam-platform\watchdog\src\Watchdog\obj\Debug\net10.0-windows\Watchdog.AssemblyInfo.cs
+C:\Users\Akhil\exam-platform\watchdog\src\Watchdog\obj\Debug\net10.0-windows\Watchdog.csproj.CoreCompileInputs.cache
+C:\Users\Akhil\exam-platform\watchdog\src\Watchdog\obj\Debug\net10.0-windows\Watchdog.sourcelink.json
