@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "GZ8RGM4Cglc=",
+  "dgSpecHash": "tr7GdzrkXI4=",
   "success": true,
   "projectFilePath": "C:\\Users\\Akhil\\exam-platform\\watchdog\\src\\Watchdog\\Watchdog.csproj",
   "expectedPackageFiles": [
@@ -21,7 +21,6 @@
     "C:\\Users\\Akhil\\.nuget\\packages\\microsoft.extensions.filesystemglobbing\\10.0.13\\microsoft.extensions.filesystemglobbing.10.0.13.nupkg.sha512",
     "C:\\Users\\Akhil\\.nuget\\packages\\microsoft.extensions.hosting\\10.0.13\\microsoft.extensions.hosting.10.0.13.nupkg.sha512",
     "C:\\Users\\Akhil\\.nuget\\packages\\microsoft.extensions.hosting.abstractions\\10.0.13\\microsoft.extensions.hosting.abstractions.10.0.13.nupkg.sha512",
-    "C:\\Users\\Akhil\\.nuget\\packages\\microsoft.extensions.hosting.windowsservices\\10.0.13\\microsoft.extensions.hosting.windowsservices.10.0.13.nupkg.sha512",
     "C:\\Users\\Akhil\\.nuget\\packages\\microsoft.extensions.logging\\10.0.13\\microsoft.extensions.logging.10.0.13.nupkg.sha512",
     "C:\\Users\\Akhil\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\10.0.13\\microsoft.extensions.logging.abstractions.10.0.13.nupkg.sha512",
     "C:\\Users\\Akhil\\.nuget\\packages\\microsoft.extensions.logging.configuration\\10.0.13\\microsoft.extensions.logging.configuration.10.0.13.nupkg.sha512",
@@ -34,8 +33,7 @@
     "C:\\Users\\Akhil\\.nuget\\packages\\microsoft.extensions.primitives\\10.0.13\\microsoft.extensions.primitives.10.0.13.nupkg.sha512",
     "C:\\Users\\Akhil\\.nuget\\packages\\system.codedom\\10.0.13\\system.codedom.10.0.13.nupkg.sha512",
     "C:\\Users\\Akhil\\.nuget\\packages\\system.diagnostics.eventlog\\10.0.13\\system.diagnostics.eventlog.10.0.13.nupkg.sha512",
-    "C:\\Users\\Akhil\\.nuget\\packages\\system.management\\10.0.13\\system.management.10.0.13.nupkg.sha512",
-    "C:\\Users\\Akhil\\.nuget\\packages\\system.serviceprocess.servicecontroller\\10.0.13\\system.serviceprocess.servicecontroller.10.0.13.nupkg.sha512"
+    "C:\\Users\\Akhil\\.nuget\\packages\\system.management\\10.0.13\\system.management.10.0.13.nupkg.sha512"
   ],
   "logs": []
 }

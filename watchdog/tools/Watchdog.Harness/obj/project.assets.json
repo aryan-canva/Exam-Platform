@@ -364,27 +364,6 @@
           "buildTransitive/net8.0/_._": {}
         }
       },
-      "Microsoft.Extensions.Hosting.WindowsServices/10.0.13": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.Extensions.Hosting": "10.0.13",
-          "Microsoft.Extensions.Logging.EventLog": "10.0.13",
-          "System.ServiceProcess.ServiceController": "10.0.13"
-        },
-        "compile": {
-          "lib/net10.0/Microsoft.Extensions.Hosting.WindowsServices.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net10.0/Microsoft.Extensions.Hosting.WindowsServices.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net8.0/_._": {}
-        }
-      },
       "Microsoft.Extensions.Logging/10.0.13": {
         "type": "package",
         "dependencies": {
@@ -667,36 +646,11 @@
           }
         }
       },
-      "System.ServiceProcess.ServiceController/10.0.13": {
-        "type": "package",
-        "dependencies": {
-          "System.Diagnostics.EventLog": "10.0.13"
-        },
-        "compile": {
-          "lib/net10.0/System.ServiceProcess.ServiceController.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net10.0/System.ServiceProcess.ServiceController.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net8.0/_._": {}
-        },
-        "runtimeTargets": {
-          "runtimes/win/lib/net10.0/System.ServiceProcess.ServiceController.dll": {
-            "assetType": "runtime",
-            "rid": "win"
-          }
-        }
-      },
       "Watchdog/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
         "dependencies": {
-          "Microsoft.Extensions.Hosting.WindowsServices": "10.0.13",
+          "Microsoft.Extensions.Hosting": "10.0.13",
           "System.Management": "10.0.13"
         },
         "compile": {
@@ -1225,37 +1179,6 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.Hosting.WindowsServices/10.0.13": {
-      "sha512": "sk3VNcYEmgwYGPF4ze/112jpaeDKSsKGhmEZ8IlhOR8F6JT+1DYaZUb14jobVXiKhuXWIKcYXV7mkSPeA4dc3g==",
-      "type": "package",
-      "path": "microsoft.extensions.hosting.windowsservices/10.0.13",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "PACKAGE.md",
-        "THIRD-PARTY-NOTICES.TXT",
-        "buildTransitive/net461/Microsoft.Extensions.Hosting.WindowsServices.targets",
-        "buildTransitive/net462/_._",
-        "buildTransitive/net8.0/_._",
-        "buildTransitive/netcoreapp2.0/Microsoft.Extensions.Hosting.WindowsServices.targets",
-        "lib/net10.0/Microsoft.Extensions.Hosting.WindowsServices.dll",
-        "lib/net10.0/Microsoft.Extensions.Hosting.WindowsServices.xml",
-        "lib/net462/Microsoft.Extensions.Hosting.WindowsServices.dll",
-        "lib/net462/Microsoft.Extensions.Hosting.WindowsServices.xml",
-        "lib/net8.0/Microsoft.Extensions.Hosting.WindowsServices.dll",
-        "lib/net8.0/Microsoft.Extensions.Hosting.WindowsServices.xml",
-        "lib/net9.0/Microsoft.Extensions.Hosting.WindowsServices.dll",
-        "lib/net9.0/Microsoft.Extensions.Hosting.WindowsServices.xml",
-        "lib/netstandard2.0/Microsoft.Extensions.Hosting.WindowsServices.dll",
-        "lib/netstandard2.0/Microsoft.Extensions.Hosting.WindowsServices.xml",
-        "lib/netstandard2.1/Microsoft.Extensions.Hosting.WindowsServices.dll",
-        "lib/netstandard2.1/Microsoft.Extensions.Hosting.WindowsServices.xml",
-        "microsoft.extensions.hosting.windowsservices.10.0.13.nupkg.sha512",
-        "microsoft.extensions.hosting.windowsservices.nuspec",
-        "useSharedDesignerContext.txt"
-      ]
-    },
     "Microsoft.Extensions.Logging/10.0.13": {
       "sha512": "fqbiPy4nUp4H2XHKAVQXKN2y3T2h4cFIx1DAAgE6iY9OHkN/OA1cKFi+geJKRWGuX6pS5SFbsjIPWHJqrxE0eg==",
       "type": "package",
@@ -1704,41 +1627,6 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "System.ServiceProcess.ServiceController/10.0.13": {
-      "sha512": "0Zh/U/1+hy1MCxx1BTikJi4L5o1Ys6VhB8PKlTNOB4/n2d6ua2+TuoD6T7xN9RV0uiOGod575pQrUSTXg+aYGQ==",
-      "type": "package",
-      "path": "system.serviceprocess.servicecontroller/10.0.13",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "PACKAGE.md",
-        "THIRD-PARTY-NOTICES.TXT",
-        "buildTransitive/net461/System.ServiceProcess.ServiceController.targets",
-        "buildTransitive/net462/_._",
-        "buildTransitive/net8.0/_._",
-        "buildTransitive/netcoreapp2.0/System.ServiceProcess.ServiceController.targets",
-        "lib/net10.0/System.ServiceProcess.ServiceController.dll",
-        "lib/net10.0/System.ServiceProcess.ServiceController.xml",
-        "lib/net462/System.ServiceProcess.ServiceController.dll",
-        "lib/net462/System.ServiceProcess.ServiceController.xml",
-        "lib/net8.0/System.ServiceProcess.ServiceController.dll",
-        "lib/net8.0/System.ServiceProcess.ServiceController.xml",
-        "lib/net9.0/System.ServiceProcess.ServiceController.dll",
-        "lib/net9.0/System.ServiceProcess.ServiceController.xml",
-        "lib/netstandard2.0/System.ServiceProcess.ServiceController.dll",
-        "lib/netstandard2.0/System.ServiceProcess.ServiceController.xml",
-        "runtimes/win/lib/net10.0/System.ServiceProcess.ServiceController.dll",
-        "runtimes/win/lib/net10.0/System.ServiceProcess.ServiceController.xml",
-        "runtimes/win/lib/net8.0/System.ServiceProcess.ServiceController.dll",
-        "runtimes/win/lib/net8.0/System.ServiceProcess.ServiceController.xml",
-        "runtimes/win/lib/net9.0/System.ServiceProcess.ServiceController.dll",
-        "runtimes/win/lib/net9.0/System.ServiceProcess.ServiceController.xml",
-        "system.serviceprocess.servicecontroller.10.0.13.nupkg.sha512",
-        "system.serviceprocess.servicecontroller.nuspec",
-        "useSharedDesignerContext.txt"
-      ]
-    },
     "Watchdog/1.0.0": {
       "type": "project",
       "path": "../../src/Watchdog/Watchdog.csproj",
@@ -1756,11 +1644,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Akhil\\exam-platform\\watchdog\\tools\\Watchdog.Harness\\Watchdog.Harness.csproj",
+      "projectUniqueName": "C:\\Users\\Akhil\\Exam-Platform\\watchdog\\tools\\Watchdog.Harness\\Watchdog.Harness.csproj",
       "projectName": "watchdog-harness",
-      "projectPath": "C:\\Users\\Akhil\\exam-platform\\watchdog\\tools\\Watchdog.Harness\\Watchdog.Harness.csproj",
+      "projectPath": "C:\\Users\\Akhil\\Exam-Platform\\watchdog\\tools\\Watchdog.Harness\\Watchdog.Harness.csproj",
       "packagesPath": "C:\\Users\\Akhil\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Akhil\\exam-platform\\watchdog\\tools\\Watchdog.Harness\\obj\\",
+      "outputPath": "C:\\Users\\Akhil\\Exam-Platform\\watchdog\\tools\\Watchdog.Harness\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Akhil\\AppData\\Roaming\\NuGet\\NuGet.Config"

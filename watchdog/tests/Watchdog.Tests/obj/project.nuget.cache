@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "R/rQMBpwmp0=",
+  "dgSpecHash": "+5vfIrk6+5M=",
   "success": true,
   "projectFilePath": "C:\\Users\\Akhil\\exam-platform\\watchdog\\tests\\Watchdog.Tests\\Watchdog.Tests.csproj",
   "expectedPackageFiles": [
@@ -22,7 +22,6 @@
     "C:\\Users\\Akhil\\.nuget\\packages\\microsoft.extensions.filesystemglobbing\\10.0.13\\microsoft.extensions.filesystemglobbing.10.0.13.nupkg.sha512",
     "C:\\Users\\Akhil\\.nuget\\packages\\microsoft.extensions.hosting\\10.0.13\\microsoft.extensions.hosting.10.0.13.nupkg.sha512",
     "C:\\Users\\Akhil\\.nuget\\packages\\microsoft.extensions.hosting.abstractions\\10.0.13\\microsoft.extensions.hosting.abstractions.10.0.13.nupkg.sha512",
-    "C:\\Users\\Akhil\\.nuget\\packages\\microsoft.extensions.hosting.windowsservices\\10.0.13\\microsoft.extensions.hosting.windowsservices.10.0.13.nupkg.sha512",
     "C:\\Users\\Akhil\\.nuget\\packages\\microsoft.extensions.logging\\10.0.13\\microsoft.extensions.logging.10.0.13.nupkg.sha512",
     "C:\\Users\\Akhil\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\10.0.13\\microsoft.extensions.logging.abstractions.10.0.13.nupkg.sha512",
     "C:\\Users\\Akhil\\.nuget\\packages\\microsoft.extensions.logging.configuration\\10.0.13\\microsoft.extensions.logging.configuration.10.0.13.nupkg.sha512",
@@ -40,7 +39,6 @@
     "C:\\Users\\Akhil\\.nuget\\packages\\system.codedom\\10.0.13\\system.codedom.10.0.13.nupkg.sha512",
     "C:\\Users\\Akhil\\.nuget\\packages\\system.diagnostics.eventlog\\10.0.13\\system.diagnostics.eventlog.10.0.13.nupkg.sha512",
     "C:\\Users\\Akhil\\.nuget\\packages\\system.management\\10.0.13\\system.management.10.0.13.nupkg.sha512",
-    "C:\\Users\\Akhil\\.nuget\\packages\\system.serviceprocess.servicecontroller\\10.0.13\\system.serviceprocess.servicecontroller.10.0.13.nupkg.sha512",
     "C:\\Users\\Akhil\\.nuget\\packages\\xunit\\2.9.3\\xunit.2.9.3.nupkg.sha512",
     "C:\\Users\\Akhil\\.nuget\\packages\\xunit.abstractions\\2.0.3\\xunit.abstractions.2.0.3.nupkg.sha512",
     "C:\\Users\\Akhil\\.nuget\\packages\\xunit.analyzers\\1.18.0\\xunit.analyzers.1.18.0.nupkg.sha512",
@@ -48,7 +46,7 @@
     "C:\\Users\\Akhil\\.nuget\\packages\\xunit.core\\2.9.3\\xunit.core.2.9.3.nupkg.sha512",
     "C:\\Users\\Akhil\\.nuget\\packages\\xunit.extensibility.core\\2.9.3\\xunit.extensibility.core.2.9.3.nupkg.sha512",
     "C:\\Users\\Akhil\\.nuget\\packages\\xunit.extensibility.execution\\2.9.3\\xunit.extensibility.execution.2.9.3.nupkg.sha512",
-    "C:\\Users\\Akhil\\.nuget\\packages\\xunit.runner.visualstudio\\2.8.2\\xunit.runner.visualstudio.2.8.2.nupkg.sha512"
+    "C:\\Users\\Akhil\\.nuget\\packages\\xunit.runner.visualstudio\\3.1.5\\xunit.runner.visualstudio.3.1.5.nupkg.sha512"
   ],
   "logs": []
 }

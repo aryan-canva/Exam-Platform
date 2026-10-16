@@ -10,11 +10,10 @@
 using System;
 using System.Reflection;
 
-[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("dotnet-Watchdog-1ae2dd08-dcd3-49ae-84ef-6e94ba9d59f7")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("Watchdog")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+861d936e39a2ce02b5be340cc7c6f3b61ec17b76")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8d386399b3e8025667810fcd393f7765233ea32d")]
 [assembly: System.Reflection.AssemblyProductAttribute("Watchdog")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Watchdog")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,19 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk.Worker">
 
+<Project Sdk="Microsoft.NET.Sdk.Worker">
   <PropertyGroup>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>dotnet-Watchdog-1ae2dd08-dcd3-49ae-84ef-6e94ba9d59f7</UserSecretsId>
+    <UserSecretsId>dotnet-Watchdog-8e0a0533-6895-4af8-ac1d-23f36398a698</UserSecretsId>
   </PropertyGroup>
-
   <ItemGroup>
-        <PackageReference Include="System.Management" Version="10.0.13" />
-        <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="10.0.13" />
-    </ItemGroup>
-
-   <ItemGroup>
-    <!-- [3] Day-1 fakes of Person 3's types. Delete this item and /stubs/watchdog when their real Events/ code lands. -->
-        <Compile Include="..\..\..\stubs\watchdog\**\*.cs" Link="Stubs\%(Filename)%(Extension)" />
-    </ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.13" />
+    <PackageReference Include="System.Management" Version="10.0.13" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\stubs\watchdog\**\*.cs"
+             Link="Stubs\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
 </Project>
+
