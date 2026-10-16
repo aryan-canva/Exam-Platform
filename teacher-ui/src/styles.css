@@ -1,0 +1,25 @@
+:root { --ink:#1b2430; --muted:#6b7686; --line:#dde2ea; --bg:#f4f1ea; --card:#fff; --accent:#1f4e79; --ok:#1d7a46; --err:#b3261e; }
+@media (prefers-color-scheme: dark) {
+  :root { --ink:#e8ecf2; --muted:#9aa5b5; --line:#2d3644; --bg:#12171f; --card:#1a212c; --accent:#6fa8dc; --ok:#5fd08f; --err:#ff8a80; }
+}
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 Georgia, "Times New Roman", serif; }
+.shell { max-width: 900px; margin: 0 auto; padding: 24px 16px 64px; }
+header { display:flex; justify-content:space-between; align-items:flex-end; border-bottom:2px solid var(--ink); padding-bottom:12px; margin-bottom:24px; }
+h1 { margin:0; font-size:28px; letter-spacing:.02em; }
+h2 { margin:0 0 12px; font-size:19px; }
+small { color:var(--muted); font-family: ui-monospace, Consolas, monospace; }
+.who { font-family: system-ui, sans-serif; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:4px; padding:20px; margin-bottom:20px; }
+.narrow { max-width:380px; margin: 40px auto; }
+.row { display:flex; justify-content:space-between; align-items:center; }
+label { display:block; margin-bottom:12px; font-family: system-ui, sans-serif; font-size:13px; color:var(--muted); }
+input, select { display:block; width:100%; margin-top:4px; padding:8px 10px; font:inherit; color:var(--ink); background:var(--bg); border:1px solid var(--line); border-radius:3px; }
+button { padding:8px 16px; font: 600 14px system-ui, sans-serif; color:#fff; background:var(--accent); border:0; border-radius:3px; cursor:pointer; }
+button:disabled { opacity:.6; cursor:wait; }
+button.ghost { background:transparent; color:var(--accent); border:1px solid var(--line); margin-left:8px; }
+table { width:100%; border-collapse:collapse; font-family: system-ui, sans-serif; font-size:14px; }
+th, td { text-align:left; padding:8px; border-bottom:1px solid var(--line); }
+th { color:var(--muted); font-weight:600; }
+.mono { font-family: ui-monospace, Consolas, monospace; font-size:12px; word-break:break-all; }
+.ok { color:var(--ok); } .err { color:var(--err); }
