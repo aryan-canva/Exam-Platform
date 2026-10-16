@@ -30,7 +30,7 @@ public class ContestController {
     @PostMapping
     public ResponseEntity<Contest> createContest(@Valid @RequestBody CreateContestRequest req,
                                                   @AuthenticationPrincipal AuthContext ctx) {
-        ctx.requireRole(User.Role.INSTRUCTOR, User.Role.ADMIN);
+        ctx.requireRole(User.Role.TEACHER, User.Role.ADMIN);
         Contest c = contestService.createContest(req, ctx.userId());
         return ResponseEntity.status(HttpStatus.CREATED).body(c);
     }
@@ -40,7 +40,7 @@ public class ContestController {
     public ResponseEntity<Void> addProblem(@PathVariable UUID id,
                                             @RequestBody Map<String, Object> body,
                                             @AuthenticationPrincipal AuthContext ctx) {
-        ctx.requireRole(User.Role.INSTRUCTOR, User.Role.ADMIN);
+        ctx.requireRole(User.Role.TEACHER, User.Role.ADMIN);
         UUID problemId = UUID.fromString((String) body.get("problemId"));
         String label   = (String) body.get("label");
         int points     = (int) body.getOrDefault("points", 100);
@@ -53,7 +53,7 @@ public class ContestController {
     public ResponseEntity<Map<String, Integer>> enroll(@PathVariable UUID id,
                                                         @RequestBody Map<String, List<String>> body,
                                                         @AuthenticationPrincipal AuthContext ctx) {
-        ctx.requireRole(User.Role.INSTRUCTOR, User.Role.ADMIN);
+        ctx.requireRole(User.Role.TEACHER, User.Role.ADMIN);
         List<UUID> userIds = body.get("userIds").stream().map(UUID::fromString).toList();
         int count = contestService.enroll(id, userIds);
         return ResponseEntity.ok(Map.of("enrolled", count));
@@ -63,7 +63,7 @@ public class ContestController {
     @PostMapping("/{id}/publish")
     public ResponseEntity<Contest> publish(@PathVariable UUID id,
                                             @AuthenticationPrincipal AuthContext ctx) {
-        ctx.requireRole(User.Role.INSTRUCTOR, User.Role.ADMIN);
+        ctx.requireRole(User.Role.TEACHER, User.Role.ADMIN);
         Contest c = contestService.publish(id);
         return ResponseEntity.ok(c);
     }

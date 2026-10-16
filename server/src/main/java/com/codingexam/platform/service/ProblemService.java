@@ -52,7 +52,12 @@ public class ProblemService {
 
         return problemRepo.save(p);
     }
+    // ── List ──────────────────────────────────────────────────────────────────
 
+    @Transactional(readOnly = true)
+    public List<Problem> listAllProblems() {
+        return problemRepo.findAll();
+    }
     // ── Testcases ─────────────────────────────────────────────────────────────
 
     /**
