@@ -1,35 +1,32 @@
-# Coding Exam Platform and Lockdown System (Team SAAD BUGS)
+# Coding Exam Platform
 
-Locked-down coding exam environment: Windows kiosk + SYSTEM watchdog, exam server, Judge0 judging, tamper-evident event log.
+Teachers build exams in a web console; students take them in a locked-down Windows app; code is judged by Docker workers. The three clients and the judge workers all connect to one server address, so they can be on different networks.
 
-## Start here
-1. `docs/HOUR0.md`: the first-hour checklist.
-2. `docs/stubs.md`: run the stub server so everyone can build in parallel.
-3. `docs/canonical-json.md` + `shared/test-vectors/`: the Java/C# byte-compatibility contract.
-4. `docs/openapi.yaml`: the API contract. `docs/class-diagrams.md` (and PDF): the design.
-
-## Layout
-| Folder | Owner | What |
+| Folder | What | Stack |
 |---|---|---|
-| `server/` | P1 (+P3 session/integrity, P4 submissions) | Java 21 + Spring Boot |
-| `watchdog/` | P2 lockdown, P3 events/IPC | C# Windows Service |
-| `kiosk/` | P4 | WPF + WebView2 |
-| `web/` | P4 (timeline page P3) | React + Vite |
-| `judge/` | P4 | Judge0 (Docker, Linux) |
-| `stubs/mock-server/` | all | zero-dependency stub of the API |
-| `shared/test-vectors/`, `tools/` | P1 + P3 | contract tests and reference implementation |
-| `scripts/` | P2 install/restore, all demo | PowerShell/bash helpers |
+| `server/` | API, auth, contests, submissions, judge queue | Java 21, Spring Boot, Postgres (Flyway) |
+| `teacher-ui/` | create problems/testcases, exams, students; live standings; judge status | React + Vite |
+| `student-app/` | exam client: Monaco editor, run/submit, timer, kiosk | Electron (Windows installer) |
+| `judge/` | two workers (judge-1, judge-2) that pull jobs and run code in isolated Docker containers | Node 18+, Docker |
+| `watchdog-linux/` | Linux integrity watchdog bundled in the student app (process kill, signed event chain). See `docs/LINUX.md`; build with `./build-linux.sh` | Node |
+| `watchdog/`, `kiosk/` | original Windows lockdown service and plans (not wired into the new student app yet) | C# |
+| `docs/` | `NETWORKING.md`, `API_ENDPOINTS.md`, `JUDGE_PROTOCOL.md`, `E2E_CHECKLIST.md` | |
+| `tools/` | `integration-test.mjs`: drives a real server end to end | Node |
 
-## Quick commands
-```bash
-python tools/verify_vectors.py          # contract vectors self-check
-node stubs/mock-server/server.js        # stub API on :8080  (student1 / password)
-node stubs/mock-server/selftest.js      # run against stub or real server (BASE=http://host:8080)
-docker compose up -d db                 # app database
-cd judge && docker compose up -d        # Judge0 (Linux, cgroups v1)
-```
+**New here? Read `docs/RUNNING.md` (step by step) and `docs/STATUS_REPORT.md` (what works, what is pending).**  
+**Windows evaluator demo:** see [`WINDOWS_DEMO_SETUP.md`](WINDOWS_DEMO_SETUP.md) for a ready-to-run local setup (includes prefilled `server/.env` demo values).
 
-## Rules
-- One feature per branch (`p2/process-monitor`), PR into `main`, one review.
-- Never run the Watchdog on your own PC. Use the Windows VM with a `clean` snapshot.
-- Change the API or canonical-JSON rules only via a PR everyone approves.
+## Quick start
+1. **Server**: `cd server && cp .env.example .env` (set secrets) `&& docker compose up -d --build`
+2. **Judge workers** (a machine with Docker): `judge/start-workers.sh http://<SERVER>:8080 <WORKER_TOKEN>` (Windows: `start-workers.ps1`)
+3. **Teacher UI**: `cd teacher-ui && npm install && npm run dev`, open it, type the server address, create the first teacher account.
+4. **Student app**: `cd student-app && npm install && npm run dist` (on Windows), install the .exe on student PCs.
+5. **Check everything**: `node tools/integration-test.mjs http://<SERVER>:8080`, then `docs/E2E_CHECKLIST.md`.
+
+Reaching the server from other networks (port-forward, Cloudflare Tunnel, Tailscale, HTTPS): `docs/NETWORKING.md`.
+
+## Typical exam
+Problems (with testcases) -> Students (paste CSV) -> Exam: add problems, enroll students, Publish -> Start when the room is ready -> students open it and the timer runs from the server clock -> watch Standings/Submissions -> End (or it ends at the time limit).
+
+## Tests
+`cd judge/worker && npm test` (workers vs mock server) | `cd student-app && npm test` (renderer, needs Playwright) | `teacher-ui`: `npm run mock` for a fake API | `tools/integration-test.mjs` (real server).
