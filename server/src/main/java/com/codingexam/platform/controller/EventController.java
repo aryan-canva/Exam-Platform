@@ -1,7 +1,6 @@
 package com.codingexam.platform.controller;
 
 import com.codingexam.platform.dto.request.IngestEventsRequest;
-import com.codingexam.platform.model.Event;
 import com.codingexam.platform.model.User;
 import com.codingexam.platform.security.AuthContext;
 import com.codingexam.platform.service.EventService;
@@ -25,19 +24,19 @@ public class EventController {
     }
 
     @PostMapping("/ingest")
-    public ResponseEntity<Map<String, Integer>> ingest(
+    public ResponseEntity<Map<String, Number>> ingest(
             @Valid @RequestBody IngestEventsRequest req,
             @AuthenticationPrincipal AuthContext ctx) {
-        int accepted = eventService.ingestEvents(req, ctx.userId());
-        return ResponseEntity.ok(Map.of("accepted", accepted));
+        EventService.IngestResult r = eventService.ingestEvents(req, ctx.userId());
+        return ResponseEntity.ok(Map.of("accepted", r.accepted(), "duplicates", r.duplicates(), "nextSeq", r.nextSeq()));
     }
 
     @GetMapping
-    public ResponseEntity<List<Event>> getEvents(
+    public ResponseEntity<List<Map<String, Object>>> getEvents(
             @RequestParam UUID sessionId,
             @AuthenticationPrincipal AuthContext ctx) {
         boolean isInstructor = ctx.hasRole(User.Role.TEACHER, User.Role.ADMIN);
-        List<Event> events = eventService.getEvents(sessionId, ctx.userId(), isInstructor);
+        List<Map<String, Object>> events = eventService.getEvents(sessionId, ctx.userId(), isInstructor);
         return ResponseEntity.ok(events);
     }
 

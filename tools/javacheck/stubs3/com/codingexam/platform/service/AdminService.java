@@ -1,0 +1,1 @@
+package com.codingexam.platform.service; import java.util.*; public class AdminService { public Map<String,Object> sessionMap(UUID id){return null;} public Map<String,Object> contestSummary(UUID id){return null;} public List<Map<String,Object>> contestSessions(UUID id){return null;} }

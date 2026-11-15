@@ -19,7 +19,7 @@ public interface SubmissionRepository extends JpaRepository<Submission, UUID> {
     @Query("""
         SELECT s FROM Submission s
         WHERE s.contest.id = :contestId
-          AND s.verdict = 'ACCEPTED'
+          AND s.verdict = 'AC'
         ORDER BY s.createdAt ASC
         """)
     List<Submission> findAcceptedByContest(@Param("contestId") UUID contestId);

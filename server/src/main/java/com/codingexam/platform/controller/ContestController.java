@@ -21,18 +21,20 @@ import java.util.UUID;
 public class ContestController {
 
     private final ContestService contestService;
+    private final com.codingexam.platform.service.AdminService admin;
 
-    public ContestController(ContestService contestService) {
+    public ContestController(ContestService contestService, com.codingexam.platform.service.AdminService admin) {
         this.contestService = contestService;
+        this.admin = admin;
     }
 
     /** POST /contests — create a new contest (INSTRUCTOR/ADMIN only) */
     @PostMapping
-    public ResponseEntity<Contest> createContest(@Valid @RequestBody CreateContestRequest req,
+    public ResponseEntity<Map<String, Object>> createContest(@Valid @RequestBody CreateContestRequest req,
                                                   @AuthenticationPrincipal AuthContext ctx) {
         ctx.requireRole(User.Role.TEACHER, User.Role.ADMIN);
         Contest c = contestService.createContest(req, ctx.userId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(c);
+        return ResponseEntity.status(HttpStatus.CREATED).body(admin.contestSummary(c.getId()));
     }
 
     /** POST /contests/{id}/problems — add a problem */
@@ -61,11 +63,19 @@ public class ContestController {
 
     /** POST /contests/{id}/publish — publish contest */
     @PostMapping("/{id}/publish")
-    public ResponseEntity<Contest> publish(@PathVariable UUID id,
+    public ResponseEntity<Map<String, Object>> publish(@PathVariable UUID id,
                                             @AuthenticationPrincipal AuthContext ctx) {
         ctx.requireRole(User.Role.TEACHER, User.Role.ADMIN);
         Contest c = contestService.publish(id);
-        return ResponseEntity.ok(c);
+        return ResponseEntity.ok(admin.contestSummary(c.getId()));
+    }
+
+    /** GET /contests/{id}/sessions — per-student session status and event counts (teacher/admin) */
+    @GetMapping("/{id}/sessions")
+    public ResponseEntity<List<Map<String, Object>>> sessions(@PathVariable UUID id,
+                                                              @AuthenticationPrincipal AuthContext ctx) {
+        ctx.requireRole(User.Role.TEACHER, User.Role.ADMIN);
+        return ResponseEntity.ok(admin.contestSessions(id));
     }
 
     /** GET /contests/{id} — student view */

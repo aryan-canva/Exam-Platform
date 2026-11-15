@@ -1,0 +1,1 @@
+package org.springframework.scheduling.annotation; public @interface Scheduled { long fixedDelay() default 0; long fixedRate() default 0; long initialDelay() default 0; String fixedDelayString() default ""; String cron() default ""; }

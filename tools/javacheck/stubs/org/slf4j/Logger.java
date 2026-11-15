@@ -1,0 +1,2 @@
+package org.slf4j;
+public interface Logger { void warn(String f, Object... a); }

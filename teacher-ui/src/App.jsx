@@ -1,156 +1,104 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import * as api from "./api.js";
+import { Msg, useAction } from "./ui.jsx";
+import Problems from "./views/Problems.jsx";
+import Contests from "./views/Contests.jsx";
+import Students from "./views/Students.jsx";
+import Judge from "./views/Judge.jsx";
+
+const TABS = [
+  ["contests", "Exams", Contests],
+  ["problems", "Problems", Problems],
+  ["students", "Students", Students],
+  ["judge", "Judge", Judge],
+];
 
 export default function App() {
   const [user, setUser] = useState(() => {
     const u = sessionStorage.getItem("user");
     return u && api.getToken() ? JSON.parse(u) : null;
   });
+  const [tab, setTab] = useState(() => sessionStorage.getItem("tab") || "contests");
 
-  const onLogin = (res) => {
-    api.setToken(res.accessToken);
-    sessionStorage.setItem("user", JSON.stringify(res.user));
-    setUser(res.user);
-  };
   const logout = useCallback(() => {
     api.setToken(null);
     sessionStorage.removeItem("user");
     setUser(null);
   }, []);
+  const onLogin = (res) => {
+    api.setToken(res.accessToken);
+    sessionStorage.setItem("user", JSON.stringify(res.user));
+    setUser(res.user);
+  };
+  const pick = (t) => { sessionStorage.setItem("tab", t); setTab(t); };
 
+  if (!user) return <Auth onLogin={onLogin} />;
+  const View = (TABS.find((t) => t[0] === tab) || TABS[0])[2];
   return (
-    <div className="shell">
-      <header>
-        <div>
-          <h1>Teacher Console</h1>
+    <div className="app">
+      <nav className="side">
+        <div className="brand">Exam Desk</div>
+        {TABS.map(([id, label]) => (
+          <button key={id} className={"navbtn" + (id === tab ? " on" : "")} onClick={() => pick(id)}>{label}</button>
+        ))}
+        <div className="grow" />
+        <div className="who">
+          <div>{user.fullName || user.username}</div>
+          <div className="dim">{api.getServerUrl()}</div>
+          <button className="link" onClick={logout}>Log out</button>
         </div>
-        {user && (
-          <div className="who">
-            {user.username} <button className="ghost" onClick={logout}>Log out</button>
-          </div>
-        )}
-      </header>
-      {user ? <Dashboard onExpired={logout} /> : <Auth onLogin={onLogin} />}
+      </nav>
+      <main className="main"><View onAuthError={logout} /></main>
     </div>
   );
 }
 
 function Auth({ onLogin }) {
   const [mode, setMode] = useState("login");
+  const [server, setServer] = useState(api.getServerUrl());
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [msg, setMsg] = useState(null);
-  const [busy, setBusy] = useState(false);
+  const [reach, setReach] = useState(null);
+  const { busy, msg, setMsg, run } = useAction();
 
+  async function test() {
+    api.setServerUrl(server);
+    setReach(null);
+    try { await api.ping(); setReach({ ok: true, text: "Server reachable" }); }
+    catch (e) { setReach({ ok: false, text: e.message }); }
+  }
   async function submit(e) {
     e.preventDefault();
-    setBusy(true); setMsg(null);
-    try {
-      if (mode === "register") {
-        await api.register(username, password);
-        setMode("login");
-        setMsg({ ok: true, text: "Teacher registered. You can log in now." });
-      } else {
-        onLogin(await api.login(username, password));
-      }
-    } catch (err) {
-      setMsg({ ok: false, text: err.message });
-    } finally { setBusy(false); }
+    api.setServerUrl(server);
+    if (mode === "register") {
+      const r = await run(() => api.register(username, password));
+      if (r !== undefined) { setMode("login"); setMsg({ ok: true, text: "Teacher account created. Log in." }); }
+    } else {
+      const r = await run(() => api.login(username, password));
+      if (r) onLogin(r);
+    }
   }
-
   return (
-    <form className="card narrow" onSubmit={submit}>
-      <h2>{mode === "login" ? "Log in" : "Register teacher"}</h2>
-      <label>Username<input value={username} onChange={(e) => setUsername(e.target.value)} required /></label>
-      <label>Password<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required /></label>
-      {msg && <p className={msg.ok ? "ok" : "err"}>{msg.text}</p>}
-      <button disabled={busy}>{busy ? "Please wait…" : mode === "login" ? "Log in" : "Register"}</button>
-      <button type="button" className="ghost" onClick={() => { setMode(mode === "login" ? "register" : "login"); setMsg(null); }}>
-        {mode === "login" ? "Need an account? Register" : "Back to log in"}
-      </button>
-    </form>
-  );
-}
-
-function Dashboard({ onExpired }) {
-  return (
-    <main>
-      <Problems onExpired={onExpired} />
-      <CreateContest onExpired={onExpired} />
-    </main>
-  );
-}
-
-const handle = (err, onExpired) => {
-  if (err.status === 401 || err.status === 403) onExpired();
-  return err.message;
-};
-
-function Problems({ onExpired }) {
-  const [problems, setProblems] = useState(null);
-  const [err, setErr] = useState(null);
-
-  const load = useCallback(() => {
-    setErr(null);
-    api.listProblems().then(setProblems).catch((e) => setErr(handle(e, onExpired)));
-  }, [onExpired]);
-  useEffect(load, [load]);
-
-  return (
-    <section className="card">
-      <div className="row"><h2>Problems</h2><button className="ghost" onClick={load}>Refresh</button></div>
-      {err && <p className="err">{err}</p>}
-      {!problems && !err && <p>Loading…</p>}
-      {problems && problems.length === 0 && <p>No problems yet.</p>}
-      {problems && problems.length > 0 && (
-        <table>
-          <thead><tr><th>Title</th><th>Time (ms)</th><th>Memory (KB)</th><th>ID</th></tr></thead>
-          <tbody>
-            {problems.map((p) => (
-              <tr key={p.id}>
-                <td>{p.title}</td><td>{p.timeLimitMs}</td><td>{p.memoryLimitKb}</td>
-                <td className="mono">{p.id}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </section>
-  );
-}
-
-function CreateContest({ onExpired }) {
-  const [title, setTitle] = useState("Demo Exam");
-  const [durationSec, setDurationSec] = useState(3600);
-  const [scoringMode, setScoringMode] = useState("ICPC");
-  const [result, setResult] = useState(null);
-  const [err, setErr] = useState(null);
-
-  async function submit(e) {
-    e.preventDefault();
-    setErr(null); setResult(null);
-    try {
-      setResult(await api.createContest({ title, durationSec: Number(durationSec), scoringMode }));
-    } catch (e2) { setErr(handle(e2, onExpired)); }
-  }
-
-  return (
-    <section className="card">
-      <h2>Create contest</h2>
-      <form onSubmit={submit}>
-        <label>Title<input value={title} onChange={(e) => setTitle(e.target.value)} required /></label>
-        <label>Duration (seconds)<input type="number" min="1" value={durationSec} onChange={(e) => setDurationSec(e.target.value)} required /></label>
-        <label>Scoring mode
-          <select value={scoringMode} onChange={(e) => setScoringMode(e.target.value)}>
-            <option>ICPC</option><option>IOI</option>
-          </select>
+    <div className="authwrap">
+      <form className="auth" onSubmit={submit}>
+        <h1>Exam Desk</h1>
+        <p className="dim">Teacher console</p>
+        <label>Server address
+          <div className="inline">
+            <input value={server} onChange={(e) => setServer(e.target.value)} placeholder="http://192.168.1.50:8080" required />
+            <button type="button" className="ghost" onClick={test}>Test</button>
+          </div>
         </label>
-        <button>Create contest</button>
+        <Msg m={reach} />
+        <label>Username<input value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" required /></label>
+        <label>Password<input type="password" value={password} minLength={mode === "register" ? 8 : undefined}
+          onChange={(e) => setPassword(e.target.value)} autoComplete={mode === "login" ? "current-password" : "new-password"} required /></label>
+        <Msg m={msg} />
+        <button disabled={busy}>{busy ? "Please wait…" : mode === "login" ? "Log in" : "Create teacher account"}</button>
+        <button type="button" className="link" onClick={() => { setMode(mode === "login" ? "register" : "login"); setMsg(null); }}>
+          {mode === "login" ? "First time here? Create the first teacher account" : "Back to log in"}
+        </button>
       </form>
-      {err && <p className="err">{err}</p>}
-      {result && (
-        <p className="ok">Created “{result.title}” — ID <span className="mono">{result.id}</span></p>
-      )}
-    </section>
+    </div>
   );
 }

@@ -1,0 +1,85 @@
+{
+  "name": "exam-student",
+  "productName": "Exam Client",
+  "version": "0.1.0",
+  "description": "Student exam application (Windows and Linux)",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --windowed",
+    "test": "node test/run-tests.mjs",
+    "dist": "electron-builder --win nsis --x64",
+    "dist:linux": "node scripts/sync-watchdog.js && electron-builder --linux AppImage deb --x64",
+    "test:watchdog": "node --test test/watchdog-e2e.test.mjs test/main-wiring.test.mjs"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "dependencies": {
+    "monaco-editor": "^0.52.0"
+  },
+  "build": {
+    "appId": "com.codingexam.client",
+    "productName": "Exam Client",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "watchdog-client.js",
+      "defaults.json",
+      "renderer/**/*",
+      "node_modules/monaco-editor/min/vs/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false
+    },
+    "extraResources": [
+      {
+        "from": "watchdog",
+        "to": "watchdog",
+        "filter": [
+          "bin/**/*",
+          "lib/**/*",
+          "package.json"
+        ]
+      }
+    ],
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Education",
+      "maintainer": "Exam Platform <admin@example.com>",
+      "synopsis": "Locked-down coding exam client",
+      "artifactName": "exam-client-${version}-${arch}.${ext}"
+    },
+    "deb": {
+      "depends": [
+        "libgtk-3-0",
+        "libnss3",
+        "libxss1",
+        "libxtst6",
+        "libatk-bridge2.0-0",
+        "libdrm2",
+        "libgbm1",
+        "libasound2t64 | libasound2"
+      ]
+    }
+  },
+  "author": {
+    "name": "Exam Platform",
+    "email": "admin@example.com"
+  },
+  "homepage": "https://example.com/exam-platform"
+}

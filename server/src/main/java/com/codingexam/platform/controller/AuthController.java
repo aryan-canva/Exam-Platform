@@ -18,9 +18,13 @@ public class AuthController {
     private final AuthService authService;
     private final UserRepository userRepository;
 
-    public AuthController(AuthService authService, UserRepository userRepository) {
+    private final com.codingexam.platform.service.AdminService admin;
+
+    public AuthController(AuthService authService, UserRepository userRepository,
+                          com.codingexam.platform.service.AdminService admin) {
         this.authService = authService;
         this.userRepository = userRepository;
+        this.admin = admin;
     }
 
     @PostMapping("/login")
@@ -30,7 +34,19 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody LoginRequest req) {
+    public ResponseEntity<?> register(@RequestBody LoginRequest req,
+            @org.springframework.security.core.annotation.AuthenticationPrincipal com.codingexam.platform.security.AuthContext caller) {
+        // First-run bootstrap: anyone may create the first teacher. After that only a logged-in teacher/admin may.
+        if (admin.anyTeacherExists()) {
+            if (caller == null) throw new com.codingexam.platform.security.AuthContext.ForbiddenException("Log in as a teacher to create another teacher account");
+            caller.requireRole(User.Role.TEACHER, User.Role.ADMIN);
+        }
+        if (req.password() == null || req.password().length() < 8) {
+            throw new com.codingexam.platform.service.JudgeQueueService.BadRequestException("Password must be at least 8 characters");
+        }
+        if (userRepository.existsByUsername(req.username())) {
+            throw new com.codingexam.platform.service.JudgeQueueService.ConflictException("Username already exists");
+        }
         User user = new User();
         user.setUsername(req.username());
         user.setPasswordHash(authService.hashPassword(req.password()));

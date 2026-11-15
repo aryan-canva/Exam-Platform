@@ -1,0 +1,12 @@
+{
+  "name": "judge-worker",
+  "version": "1.0.0",
+  "description": "Pulls jobs from the exam server and judges them in isolated Docker containers",
+  "private": true,
+  "main": "worker.js",
+  "scripts": {
+    "start": "node worker.js",
+    "test": "node test/run-tests.js"
+  },
+  "engines": { "node": ">=18" }
+}

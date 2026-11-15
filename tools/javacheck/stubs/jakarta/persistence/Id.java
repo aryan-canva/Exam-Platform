@@ -1,0 +1,2 @@
+package jakarta.persistence;
+public @interface Id { String name() default ""; String[] columnNames() default {}; boolean nullable() default true; int length() default 255; String columnDefinition() default ""; FetchType fetch() default FetchType.EAGER; GenerationType strategy() default GenerationType.UUID; EnumType value() default EnumType.STRING; UniqueConstraint[] uniqueConstraints() default {}; boolean updatable() default true; }

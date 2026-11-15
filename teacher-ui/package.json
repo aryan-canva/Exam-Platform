@@ -1,12 +1,14 @@
 {
   "name": "teacher-ui",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview --host"
+    "preview": "vite preview --host",
+    "mock": "node test/mock-server.mjs",
+    "test": "node --test test/integrity.test.mjs test/mock-api.test.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

@@ -21,30 +21,32 @@ import java.util.UUID;
 public class ProblemController {
 
     private final ProblemService problemService;
+    private final com.codingexam.platform.service.AdminService admin;
 
-    public ProblemController(ProblemService problemService) {
+    public ProblemController(ProblemService problemService, com.codingexam.platform.service.AdminService admin) {
         this.problemService = problemService;
+        this.admin = admin;
     }
 
     /** POST /problems — create a problem */
     @PostMapping
-    public ResponseEntity<Problem> createProblem(@Valid @RequestBody CreateProblemRequest req,
+    public ResponseEntity<Map<String, Object>> createProblem(@Valid @RequestBody CreateProblemRequest req,
                                                    @AuthenticationPrincipal AuthContext ctx) {
         ctx.requireRole(User.Role.TEACHER, User.Role.ADMIN);
         Problem p = problemService.createProblem(req, ctx.userId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(p);
+        return ResponseEntity.status(HttpStatus.CREATED).body(admin.problemMap(p.getId()));
     }
     
 /** GET /problems — list all problems */
 @GetMapping
-public ResponseEntity<java.util.List<Problem>> listProblems(
+public ResponseEntity<java.util.List<Map<String, Object>>> listProblems(
         @AuthenticationPrincipal AuthContext ctx) {
     ctx.requireRole(User.Role.TEACHER, User.Role.ADMIN);
-    return ResponseEntity.ok(problemService.listAllProblems());
+    return ResponseEntity.ok(admin.listProblems());
 }
     /** POST /problems/{id}/testcases — add a testcase */
     @PostMapping("/{id}/testcases")
-    public ResponseEntity<Testcase> addTestcase(@PathVariable UUID id,
+    public ResponseEntity<Map<String, Object>> addTestcase(@PathVariable UUID id,
                                                  @RequestBody Map<String, Object> body,
                                                  @AuthenticationPrincipal AuthContext ctx) {
         ctx.requireRole(User.Role.TEACHER, User.Role.ADMIN);
@@ -55,7 +57,7 @@ public ResponseEntity<java.util.List<Problem>> listProblems(
         Integer groupNo    = body.containsKey("groupNo") ? (Integer) body.get("groupNo") : null;
 
         Testcase tc = problemService.addTestcase(id, inputRef, expectedRef, points, isSample, groupNo);
-        return ResponseEntity.status(HttpStatus.CREATED).body(tc);
+        return ResponseEntity.status(HttpStatus.CREATED).body(admin.testcaseMap(tc.getId()));
     }
 
     /** GET /problems/{id}?contestId={cid} — student view */

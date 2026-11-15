@@ -2,6 +2,7 @@ package com.codingexam.platform.exception;
 
 import com.codingexam.platform.security.AuthContext;
 import com.codingexam.platform.service.AuthService;
+import com.codingexam.platform.service.JudgeQueueService;
 import com.codingexam.platform.service.ContestService;
 import com.codingexam.platform.service.EventService;
 import com.codingexam.platform.service.PolicyService;
@@ -23,7 +24,8 @@ public class GlobalExceptionHandler {
         PolicyService.NotFoundException.class,
         SessionService.NotFoundException.class,
         SubmissionService.NotFoundException.class,
-        EventService.NotFoundException.class
+        EventService.NotFoundException.class,
+        JudgeQueueService.NotFoundException.class
     })
     public ResponseEntity<Map<String, Object>> handleNotFound(RuntimeException ex) {
         return error(HttpStatus.NOT_FOUND, "NOT_FOUND", ex.getMessage());
@@ -33,7 +35,8 @@ public class GlobalExceptionHandler {
         ContestService.ConflictException.class,
         SessionService.ConflictException.class,
         SubmissionService.ConflictException.class,
-        EventService.ConflictException.class
+        EventService.ConflictException.class,
+        JudgeQueueService.ConflictException.class
     })
     public ResponseEntity<Map<String, Object>> handleConflict(RuntimeException ex) {
         return error(HttpStatus.CONFLICT, "CONFLICT", ex.getMessage());
@@ -44,10 +47,26 @@ public class GlobalExceptionHandler {
         ContestService.ForbiddenException.class,
         SessionService.ForbiddenException.class,
         SubmissionService.ForbiddenException.class,
-        EventService.ForbiddenException.class
+        EventService.ForbiddenException.class,
+        JudgeQueueService.ForbiddenException.class
     })
     public ResponseEntity<Map<String, Object>> handleForbidden(RuntimeException ex) {
         return error(HttpStatus.FORBIDDEN, "FORBIDDEN", ex.getMessage());
+    }
+
+    @ExceptionHandler(EventService.IntegrityException.class)
+    public ResponseEntity<Map<String, Object>> handleIntegrity(RuntimeException ex) {
+        return error(HttpStatus.BAD_REQUEST, "INTEGRITY_VIOLATION", ex.getMessage());
+    }
+
+    @ExceptionHandler(JudgeQueueService.BadRequestException.class)
+    public ResponseEntity<Map<String, Object>> handleBadRequest(RuntimeException ex) {
+        return error(HttpStatus.BAD_REQUEST, "BAD_REQUEST", ex.getMessage());
+    }
+
+    @ExceptionHandler(JudgeQueueService.UnauthorizedException.class)
+    public ResponseEntity<Map<String, Object>> handleWorkerAuth(RuntimeException ex) {
+        return error(HttpStatus.UNAUTHORIZED, "WORKER_AUTH", ex.getMessage());
     }
 
     @ExceptionHandler(AuthService.AuthException.class)

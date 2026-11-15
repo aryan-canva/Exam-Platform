@@ -32,3 +32,12 @@ build/
 ### VS Code ###
 .vscode/
 keys/
+# Environment variables and secrets
+**/.env*
+!**/.env.example
+
+# Dependencies and generated files
+**/node_modules/
+**/target/
+**/dist/
+*.log

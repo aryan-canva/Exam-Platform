@@ -29,7 +29,9 @@ public class SecurityConfig {
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/register").permitAll()
+                .requestMatchers(HttpMethod.GET, "/time").permitAll()   // students check reachability before login
                 .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers("/judge/**").permitAll()   // judge workers: X-Worker-Token checked in JudgeController
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

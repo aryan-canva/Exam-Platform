@@ -2,6 +2,8 @@ package com.codingexam.platform.model;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -30,8 +32,13 @@ public class Event {
     @Column(nullable = false)
     private Instant ts;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "payload_json", columnDefinition = "jsonb")
     private String payloadJson;
+
+    /** Exact text that was hashed. payloadJson (JSONB) re-orders keys, so verification uses this. */
+    @Column(name = "payload_raw", columnDefinition = "text")
+    private String payloadRaw;
 
     @Column(name = "prev_hash", length = 64)
     private String prevHash;
@@ -61,6 +68,8 @@ public class Event {
     public void setTs(Instant ts) { this.ts = ts; }
     public String getPayloadJson() { return payloadJson; }
     public void setPayloadJson(String payloadJson) { this.payloadJson = payloadJson; }
+    public String getPayloadRaw() { return payloadRaw; }
+    public void setPayloadRaw(String payloadRaw) { this.payloadRaw = payloadRaw; }
     public String getPrevHash() { return prevHash; }
     public void setPrevHash(String prevHash) { this.prevHash = prevHash; }
     public String getHash() { return hash; }

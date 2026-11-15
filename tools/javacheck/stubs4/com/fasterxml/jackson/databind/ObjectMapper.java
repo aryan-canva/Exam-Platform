@@ -1,0 +1,1 @@
+package com.fasterxml.jackson.databind; public class ObjectMapper { public JsonNode readTree(String s) throws Exception {return null;} public String writeValueAsString(Object o) throws Exception {return null;} public <T> T readValue(String s, Class<T> c) throws Exception {return null;} public <T> T convertValue(Object o, Class<T> c){return null;} }

@@ -1,71 +1,26 @@
-version: '3.9'
-
+# Exam server + its Postgres. Judge workers run separately (see ../judge) and connect over HTTP.
+#   cp .env.example .env   # fill in the four secrets
+#   docker compose up -d --build
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: coding_exam_postgres
     environment:
       POSTGRES_DB: coding_exam_platform
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"      # local only; the database is never exposed to the network
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d coding_exam_platform"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
-      retries: 5
-
-  judge0:
-    image: judge0/judge0:1.13.1
-    container_name: coding_exam_judge0
-    depends_on:
-      - judge0_db
-      - judge0_redis
-    ports:
-      - "2358:2358"
-    environment:
-      REDIS_URL: redis://judge0_redis:6379
-      DATABASE_URL: postgres://judge0:judge0@judge0_db:5432/judge0
-      WORKERS_MAX: 4
-      MAX_QUEUE_SIZE: 100
-    privileged: true
+      retries: 10
     restart: unless-stopped
-
-  judge0_worker:
-    image: judge0/judge0:1.13.1
-    container_name: coding_exam_judge0_worker
-    depends_on:
-      - judge0_db
-      - judge0_redis
-    command: ["./scripts/workers"]
-    environment:
-      REDIS_URL: redis://judge0_redis:6379
-      DATABASE_URL: postgres://judge0:judge0@judge0_db:5432/judge0
-    privileged: true
-    restart: unless-stopped
-
-  judge0_db:
-    image: postgres:13-alpine
-    container_name: coding_exam_judge0_db
-    environment:
-      POSTGRES_DB: judge0
-      POSTGRES_USER: judge0
-      POSTGRES_PASSWORD: judge0
-    volumes:
-      - judge0_db_data:/var/lib/postgresql/data
-
-  judge0_redis:
-    image: redis:7-alpine
-    container_name: coding_exam_judge0_redis
 
   server:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: coding_exam_server
+    build: .
     depends_on:
       postgres:
         condition: service_healthy
@@ -74,9 +29,12 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/coding_exam_platform
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-      APP_JWT_SECRET: ${APP_JWT_SECRET:-change-me-in-production-use-256-bit-secret}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      APP_JWT_SECRET: ${APP_JWT_SECRET:?set APP_JWT_SECRET in .env}
+      APP_JUDGE_WORKER_TOKEN: ${APP_JUDGE_WORKER_TOKEN:?set APP_JUDGE_WORKER_TOKEN in .env}
+      APP_INTEGRITY_SECRET: ${APP_INTEGRITY_SECRET:?set APP_INTEGRITY_SECRET in .env}
+      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-*}
+      APP_REQUIRE_STRONG_SECRETS: ${APP_REQUIRE_STRONG_SECRETS:-false}   # true = refuse to start with placeholder secrets
       APP_CRYPTO_PRIVATE_KEY_PATH: /app/keys/ed25519_private.pem
       APP_CRYPTO_PUBLIC_KEY_PATH: /app/keys/ed25519_public.pem
     volumes:
@@ -85,5 +43,4 @@ services:
 
 volumes:
   postgres_data:
-  judge0_db_data:
   crypto_keys:

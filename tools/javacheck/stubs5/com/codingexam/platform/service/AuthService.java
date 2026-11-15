@@ -1,0 +1,1 @@
+package com.codingexam.platform.service; public class AuthService { public String hashPassword(String p){return p;} public static class AuthException extends RuntimeException { public AuthException(String m){super(m);} } }

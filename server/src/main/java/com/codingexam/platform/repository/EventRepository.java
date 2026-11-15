@@ -13,6 +13,8 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
 
     Optional<Event> findTopBySessionIdOrderBySeqDesc(UUID sessionId);
 
+    Optional<Event> findBySessionIdAndSeq(UUID sessionId, long seq);
+
     int countBySessionIdAndType(UUID sessionId, String type);
 
     List<Event> findBySessionIdAndSeverity(UUID sessionId, String severity);

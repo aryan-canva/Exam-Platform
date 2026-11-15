@@ -1,0 +1,10 @@
+{
+  "name": "exam-watchdog-linux",
+  "version": "0.1.0",
+  "description": "Linux integrity watchdog for the exam student app: process monitor + signed hash-chained events uploaded to the exam server",
+  "type": "module",
+  "private": true,
+  "bin": { "exam-watchdog": "bin/exam-watchdog.mjs" },
+  "scripts": { "test": "node --test test/*.test.js" },
+  "engines": { "node": ">=18" }
+}
